@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanEntry;
@@ -56,6 +57,8 @@ public class Drivebase extends SubsystemBase {
 
   private SwerveDrivePoseEstimator poseEstimator;
 
+  private SwerveDriveOdometry odometry;
+
   private Field2d field = new Field2d();
 
   private SlewRateLimiter slewRateX = new SlewRateLimiter(DriveConstants.slewRate);
@@ -71,7 +74,10 @@ public class Drivebase extends SubsystemBase {
     var table = inst.getTable("SmartDashboard");
     this.fieldOrientedEntry = table.getBooleanTopic("Field Oriented").getEntry(true);
     this.gyro = gyro;
-    poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositions(), getPose());
+
+    odometry = new SwerveDriveOdometry(kinematics, gyro.getRotation2d(), getPositions());
+
+    poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositions(), odometry.getPoseMeters());
 
     frontCamera = new Camera("Pineapple", new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)));
 
@@ -167,6 +173,8 @@ public class Drivebase extends SubsystemBase {
   public void periodic() {
     var positions = getPositions();
 
+    odometry.update(gyro.getRotation2d(), positions);
+
     poseEstimator.update(gyro.getRotation2d(), positions);
     
     frontCamera.update(poseEstimator);
@@ -180,7 +188,7 @@ public class Drivebase extends SubsystemBase {
     SmartDashboard.putNumber("x", x);
     SmartDashboard.putNumber("y", y);
     SmartDashboard.putNumber("rot", rotation);
-    field.setRobotPose(getPose());
+    field.setRobotPose(pose);
 
     Shuffleboard.selectTab("Drive");
     SmartDashboard.putNumber("module output", modules[0].getDriveOutput());

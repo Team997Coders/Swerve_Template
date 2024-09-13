@@ -37,6 +37,11 @@ public class Camera
 
     public int get_tag_id()
     {
-        return this.camera.getLatestResult().getBestTarget().getFiducialId();
+        var BestTarget = this.camera.getLatestResult().getBestTarget();
+        if (BestTarget != null)
+        {
+            return BestTarget.getFiducialId();
+        }
+        return 0;
     }
 }
