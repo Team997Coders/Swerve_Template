@@ -6,19 +6,25 @@ package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.Drive;
+import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.Drivebase;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj2.command.Command;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.GoToTag;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -43,16 +49,22 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
 
+  private Camera frontCamera;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
     // Configure the trigger bindings
     drivebase.setDefaultCommand(
         new Drive(
             drivebase,
             () -> getScaledXY(),
             () -> scaleRotationAxis(driveStick.getRawAxis(4))));
+
+    JoystickButton button_a = new JoystickButton(driveStick, 1);
+    button_a.whileTrue(new GoToTag(drivebase, frontCamera.robot_to_tag(drivebase), 0.0));
 
     configureBindings();
   }

@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -79,7 +80,7 @@ public class Drivebase extends SubsystemBase {
 
     poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositions(), odometry.getPoseMeters());
 
-    frontCamera = new Camera("Pineapple", new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)));
+    frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
 
     SmartDashboard.putData("Field", field);
   }
@@ -171,6 +172,7 @@ public class Drivebase extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     var positions = getPositions();
 
     odometry.update(gyro.getRotation2d(), positions);
@@ -199,6 +201,21 @@ public class Drivebase extends SubsystemBase {
     SmartDashboard.putNumber("BR Encoder", backRight.getEncoder());
     SmartDashboard.putNumber("BL Encoder", backLeft.getEncoder());
 
-    SmartDashboard.putNumber("Front Camera", frontCamera.get_tag_id());
+    Pose3d robotFieldRelativePose = frontCamera.get_field_relative_pose();
+    Transform3d robotToTagTransform3d = frontCamera.get_tag_Transform3d();
+    Translation2d robotToTag = frontCamera.robot_to_tag(this);
+
+    SmartDashboard.putString("Front Camera Translation to Tag", robotToTagTransform3d.getTranslation().toString());
+
+    SmartDashboard.putNumber("Tag Pitch", frontCamera.get_tag_Pitch());
+    SmartDashboard.putNumber("Tag Yaw", frontCamera.get_tag_Yaw());
+
+    SmartDashboard.putNumber("Robot relative field pose x", robotFieldRelativePose.getX());
+    SmartDashboard.putNumber("Robot relative field pose y", robotFieldRelativePose.getY());
+    SmartDashboard.putNumber("Robot relative field pose z", robotFieldRelativePose.getZ());
+
+    SmartDashboard.putNumber("Robot to tag Translation x", robotToTag.getX());
+    SmartDashboard.putNumber("Robot to tag Translation y", robotToTag.getY());
+    SmartDashboard.putNumber("Robot to tag Rotation Yaw", robotToTag.getAngle().getDegrees());
   }
 }

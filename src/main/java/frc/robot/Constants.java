@@ -42,9 +42,9 @@ public final class Constants {
           true,
           false,
           1,
-          //.462 //swervebot
+          .462 //swervebot
           //0.303 //apollo
-          0
+          //0
           );
 
       // Front Right
@@ -55,9 +55,9 @@ public final class Constants {
           true,
           false,
           1,
-          //0 //swervebot 
+          0 //swervebot 
           //0.966 //apollo
-          0
+          //0
           );
 
       // Back Right
@@ -68,9 +68,9 @@ public final class Constants {
           true,
           false,
           1,
-          //.759 //swervebot
+          .759 //swervebot
           //0.485 //apollo
-          0
+          //0
           );
 
       // Back Left
@@ -81,10 +81,10 @@ public final class Constants {
           true,
           false,
           1,
-          //.158 // swervebot
+          .158 // swervebot
           //0.199 //apollo 
           //encoder offsets -> 0 to 1
-          0
+          //0
       );
     }
 
