@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -64,6 +65,8 @@ public class Drivebase extends SubsystemBase {
 
   private SlewRateLimiter slewRateX = new SlewRateLimiter(DriveConstants.slewRate);
   private SlewRateLimiter slewRateY = new SlewRateLimiter(DriveConstants.slewRate);
+
+  private static XboxController driveStick = new XboxController(0);
 
   private BooleanEntry fieldOrientedEntry;
 
@@ -203,7 +206,7 @@ public class Drivebase extends SubsystemBase {
 
     Pose3d robotFieldRelativePose = frontCamera.get_field_relative_pose();
     Transform3d robotToTagTransform3d = frontCamera.get_tag_Transform3d();
-    Translation2d robotToTag = frontCamera.robot_to_tag(this);
+    //Translation2d robotToTag = frontCamera.robot_to_tag(this);
 
     SmartDashboard.putString("Front Camera Translation to Tag", robotToTagTransform3d.getTranslation().toString());
 
@@ -214,8 +217,10 @@ public class Drivebase extends SubsystemBase {
     SmartDashboard.putNumber("Robot relative field pose y", robotFieldRelativePose.getY());
     SmartDashboard.putNumber("Robot relative field pose z", robotFieldRelativePose.getZ());
 
-    SmartDashboard.putNumber("Robot to tag Translation x", robotToTag.getX());
-    SmartDashboard.putNumber("Robot to tag Translation y", robotToTag.getY());
-    SmartDashboard.putNumber("Robot to tag Rotation Yaw", robotToTag.getAngle().getDegrees());
+    //SmartDashboard.putNumber("Robot to tag Translation x", robotToTag.getX());
+    //SmartDashboard.putNumber("Robot to tag Translation y", robotToTag.getY());
+    //SmartDashboard.putNumber("Robot to tag Rotation Yaw", robotToTag.getAngle().getDegrees());
+
+    SmartDashboard.putBoolean("Button 1", driveStick.getAButton());
   }
 }

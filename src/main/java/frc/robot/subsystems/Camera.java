@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 
 public class Camera
@@ -104,18 +105,21 @@ public class Camera
         return new Translation2d();
     }
 
-    public Translation2d tagPose(Drivebase drivebase)
+    public double get_distance_to_tag()
     {
         var results = this.camera.getLatestResult();
         if (results.hasTargets())
         {
             PhotonTrackedTarget target = results.getBestTarget();
-            Translation2d translationToTag = target.getBestCameraToTarget().getTranslation().toTranslation2d();
-            Rotation2d rotationToTag = target.getBestCameraToTarget().getRotation().toRotation2d();
-            Pose2d tagPose = new Pose2d(translationToTag, rotationToTag);
-            double distanceToTarget = PhotonUtils.getDistanceToPose(drivebase.getPose(), tagPose);
-            return PhotonUtils.estimateCameraToTargetTranslation(distanceToTarget, Rotation2d.fromDegrees(-target.getYaw()));
+            Optional<Pose3d> tagPose = aprilTagFieldLayout.getTagPose(target.getFiducialId());
+            if (tagPose.isPresent())
+            {
+                return PhotonUtils.calculateDistanceToTargetMeters(this.photonPoseEstimator.getRobotToCameraTransform().getZ(), 
+                tagPose.orElseThrow().getZ(), 
+                this.photonPoseEstimator.getRobotToCameraTransform().getRotation().getY(), 
+                Units.degreesToRadians(get_tag_Pitch()));
+            }
         }
-        return new Translation2d();
+        return 0;
     }
 }

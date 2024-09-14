@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
-
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -64,7 +65,8 @@ public class RobotContainer {
             () -> scaleRotationAxis(driveStick.getRawAxis(4))));
 
     JoystickButton button_a = new JoystickButton(driveStick, 1);
-    button_a.whileTrue(new GoToTag(drivebase, frontCamera.robot_to_tag(drivebase), 0.0));
+    button_a.whileTrue(new GoToTag(drivebase, () -> frontCamera.robot_to_tag(drivebase), 0.0));
+    
 
     configureBindings();
   }
