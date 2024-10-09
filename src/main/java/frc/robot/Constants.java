@@ -42,8 +42,9 @@ public final class Constants {
           true,
           false,
           1,
-          .462 //swervebot
+          0.303
           //0.303 //apollo
+          //.462 //swervebot
           //0
           );
 
@@ -55,8 +56,9 @@ public final class Constants {
           true,
           false,
           1,
-          0 //swervebot 
+          0.966
           //0.966 //apollo
+          //0 //swervebot 
           //0
           );
 
@@ -68,8 +70,9 @@ public final class Constants {
           true,
           false,
           1,
-          .759 //swervebot
+          .485 
           //0.485 //apollo
+          //0.759 //swervebot
           //0
           );
 
@@ -81,8 +84,9 @@ public final class Constants {
           true,
           false,
           1,
-          .158 // swervebot
+          .199 //apollo
           //0.199 //apollo 
+          //0.158 // swervebot
           //encoder offsets -> 0 to 1
           //0
       );

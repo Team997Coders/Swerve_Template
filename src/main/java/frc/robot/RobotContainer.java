@@ -8,9 +8,20 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.Drivebase;
+
+import java.util.List;
+
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -65,8 +76,13 @@ public class RobotContainer {
             () -> scaleRotationAxis(driveStick.getRawAxis(4))));
 
     JoystickButton button_a = new JoystickButton(driveStick, 1);
-    button_a.whileTrue(new GoToTag(drivebase, () -> frontCamera.robot_to_tag(drivebase), 0.0));
+    button_a.whileTrue(new GoToTag(drivebase, frontCamera.get_tag_pose2d(), 0.0));
     
+    autoChooser = AutoBuilder.buildAutoChooser("Leave");
+    SmartDashboard.putData("Auto Choser", autoChooser);
+
+    //TODO: need to register autos so they show up on auto chooser
+    //EX: NamedCommands.registerCommand("Intake", new Intake(indexer));
 
     configureBindings();
   }
@@ -177,7 +193,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return new InstantCommand();
+    //PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("Leave");
+    return autoChooser.getSelected();
   }
 }

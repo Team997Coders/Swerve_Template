@@ -27,6 +27,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   public ShuffleboardTab drive_tab;
   public ShuffleboardTab debug_tab;
+  private int autoPeriodicCount;
 
 
   /**
@@ -90,6 +91,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    autoPeriodicCount = 0;
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -100,6 +102,16 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    autoPeriodicCount++;
+    if (autoPeriodicCount % 25 == 0)
+    {
+      m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+    }
+    }
   }
 
   @Override

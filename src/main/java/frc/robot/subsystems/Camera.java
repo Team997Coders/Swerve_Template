@@ -55,6 +55,19 @@ public class Camera
         return new Transform3d();
     }
 
+    public Pose2d get_tag_pose2d()
+    {
+        var results = this.camera.getLatestResult();
+        if (results.hasTargets())
+        {
+            Optional<Pose3d> tagPose = aprilTagFieldLayout.getTagPose(results.getBestTarget().getFiducialId());
+            if(tagPose.isPresent())
+            {
+                return tagPose.orElseThrow().toPose2d();
+            }
+        }
+        return new Pose2d();
+    }
 
     public double get_tag_Yaw()
     {
