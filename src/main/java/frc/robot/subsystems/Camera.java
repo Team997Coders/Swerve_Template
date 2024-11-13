@@ -24,6 +24,7 @@ public class Camera
     private PhotonCamera camera;
     private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     private PhotonPoseEstimator photonPoseEstimator;
+    private static final Boolean updatePosition = true;
 
     public Camera(String cameraName, Transform3d robotToCamera)
     {
@@ -34,13 +35,16 @@ public class Camera
 
     public void update(SwerveDrivePoseEstimator poseEstimator)
     {
-        var results = this.camera.getLatestResult();
-        if (results.hasTargets())
+        if (updatePosition)
         {
-            Optional<EstimatedRobotPose> estimatedRobotPose = this.photonPoseEstimator.update(results);
-            if (estimatedRobotPose.isPresent())
+            var results = this.camera.getLatestResult();
+            if (results.hasTargets())
             {
-                poseEstimator.addVisionMeasurement(estimatedRobotPose.orElseThrow().estimatedPose.toPose2d(), results.getTimestampSeconds());
+                Optional<EstimatedRobotPose> estimatedRobotPose = this.photonPoseEstimator.update(results);
+                if (estimatedRobotPose.isPresent())
+                {
+                    poseEstimator.addVisionMeasurement(estimatedRobotPose.orElseThrow().estimatedPose.toPose2d(), results.getTimestampSeconds());
+                }
             }
         }
     }

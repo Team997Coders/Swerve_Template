@@ -9,16 +9,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
-
 import swervelib.SwerveModule;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -80,7 +77,7 @@ public class Drivebase extends SubsystemBase {
   private Camera frontCamera;
 
   /** Creates a new Drivebase. */
-  public Drivebase(AHRS gyro) {
+  public Drivebase(AHRS gyro, Camera frontCamera) {
     var inst = NetworkTableInstance.getDefault();
     var table = inst.getTable("SmartDashboard");
     this.fieldOrientedEntry = table.getBooleanTopic("Field Oriented").getEntry(true);
@@ -90,8 +87,8 @@ public class Drivebase extends SubsystemBase {
 
     poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositions(), odometry.getPoseMeters());
 
-    frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
-
+    this.frontCamera = frontCamera;
+    
     SmartDashboard.putData("Field", field);
 
     AutoBuilder.configureHolonomic(
@@ -210,7 +207,7 @@ public class Drivebase extends SubsystemBase {
 
     poseEstimator.update(gyro.getRotation2d(), positions);
     
-    frontCamera.update(poseEstimator);
+    this.frontCamera.update(poseEstimator);
 
     var pose = getPose();
 

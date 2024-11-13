@@ -8,31 +8,23 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.Drive;
 import frc.robot.subsystems.Camera;
 import frc.robot.subsystems.Drivebase;
-
-import java.util.List;
-
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -51,37 +43,39 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final AHRS gyro = new AHRS();
 
-  private final Drivebase drivebase = new Drivebase(gyro);
-
   private static XboxController driveStick = new XboxController(0);
 
   // private static CommandXboxController c_driveStick2 = new
   // CommandXboxController(1);
   private static CommandXboxController c_driveStick = new CommandXboxController(0);
 
+  private static final Camera frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
+
   private SendableChooser<Command> autoChooser;
 
-  private Camera frontCamera;
+  private final Drivebase drivebase = new Drivebase(gyro, frontCamera);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
+    
     // Configure the trigger bindings
     drivebase.setDefaultCommand(
         new Drive(
             drivebase,
             () -> getScaledXY(),
             () -> scaleRotationAxis(driveStick.getRawAxis(4))));
+    Command goToTag = new GoToTag(drivebase, frontCamera, 2.0);
 
     JoystickButton button_a = new JoystickButton(driveStick, 1);
-    button_a.whileTrue(new GoToTag(drivebase, frontCamera.get_tag_pose2d(), 0.0));
+    button_a.onTrue(goToTag);
     
     autoChooser = AutoBuilder.buildAutoChooser("Leave");
     SmartDashboard.putData("Auto Choser", autoChooser);
 
     //TODO: need to register autos so they show up on auto chooser
+    //Also register Mechanisms so they work 
     //EX: NamedCommands.registerCommand("Intake", new Intake(indexer));
 
     configureBindings();
@@ -193,7 +187,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //PathPlannerPath path = PathPlannerPath.fromChoreoTrajectory("Leave");
-    return autoChooser.getSelected();
+    PathPlannerPath path = PathPlannerPath.fromPathFile("Leave");
+    //return autoChooser.getSelected();
+    return AutoBuilder.followPath(path);
   }
 }
